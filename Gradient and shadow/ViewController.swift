@@ -1,59 +1,56 @@
 import UIKit
 
 class ViewController: UIViewController {
-    var shadowView: UIView!
-    var squareView: UIView!
+    
+    lazy var cyanView = View()
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Create a shadow view
-        shadowView = UIView()
-        shadowView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(shadowView)
-
-        // Set constraints for the shadow view
-        NSLayoutConstraint.activate([
-            shadowView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            shadowView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 100),
-            shadowView.widthAnchor.constraint(equalToConstant: 100),
-            shadowView.heightAnchor.constraint(equalToConstant: 100)
-        ])
-
-        // Create a square view
-        squareView = UIView()
-        squareView.translatesAutoresizingMaskIntoConstraints = false
-        shadowView.addSubview(squareView)
-
-        // Set constraints for the square view
-        NSLayoutConstraint.activate([
-            squareView.topAnchor.constraint(equalTo: shadowView.topAnchor),
-            squareView.leadingAnchor.constraint(equalTo: shadowView.leadingAnchor),
-            squareView.trailingAnchor.constraint(equalTo: shadowView.trailingAnchor),
-            squareView.bottomAnchor.constraint(equalTo: shadowView.bottomAnchor)
-        ])
+        cyanView.layer.cornerRadius = 8
+        cyanView.backgroundColor = .systemCyan
+        view.addSubview(cyanView)
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        cyanView.frame = .init(x: 100, y: cyanView.frame.origin.y, width: 120, height: 120)
+        cyanView.center.y = view.frame.height / 2
+    }
+}
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-
-        // Round the corners of the square view
-        let cornerRadius = squareView.bounds.width / 6
-        squareView.layer.cornerRadius = cornerRadius
-        squareView.layer.masksToBounds = true
-
-        // Apply shadow to the shadow view
-        shadowView.layer.shadowColor = UIColor.black.cgColor
-        shadowView.layer.shadowOpacity = 1
-        shadowView.layer.shadowOffset = CGSize(width: 2, height: 2)
-        shadowView.layer.shadowRadius = 4
-
-        // Add gradient to the square view
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.frame = squareView.bounds
-        gradientLayer.colors = [UIColor.red.cgColor, UIColor.blue.cgColor]
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
-        squareView.layer.addSublayer(gradientLayer)
+class View: UIView {
+    
+    let gradientLayer = CAGradientLayer()
+    
+    init() {
+        super.init(frame: .zero)
+        
+        backgroundColor = .systemCyan
+        
+        layer.cornerCurve = .continuous
+        
+        layer.shadowOpacity = 0.3
+        layer.shadowColor = UIColor.black.cgColor
+        layer.shadowOffset = .init (width: .zero, height: 12)
+        layer.shadowRadius = 12
+        
+        gradientLayer.startPoint = .init(x: 0, y: 0)
+        gradientLayer.endPoint = .init(x: 1, y: 0.5)
+        gradientLayer.colors = [UIColor.systemRed.withAlphaComponent(0.1), UIColor.systemRed.cgColor]
+        layer.addSublayer(gradientLayer)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSublayers(of layer: CALayer) {
+        super.layoutSublayers(of: layer)
+        if layer == self.layer {
+            gradientLayer.frame = bounds
+            gradientLayer.cornerRadius = layer.cornerRadius
+        }
     }
 }
